@@ -12,7 +12,7 @@ class Anime(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_WATCHING
     )
-    # picture shown on the card (filled in when a title is picked from the online search)
+    # picture shown on the card 
     poster_url = models.URLField(max_length=500, blank=True, default='')
 
     # every title belongs to the user who added it
