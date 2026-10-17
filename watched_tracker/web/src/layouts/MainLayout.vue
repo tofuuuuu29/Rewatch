@@ -16,19 +16,20 @@ const logout = () => {
 	<div class="min-h-screen">
 		<header class="sticky top-0 z-40 border-b border-white/10 bg-ink/75 backdrop-blur-xl">
 			<div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
-				<RouterLink :to="{name: 'dashboard'}" class="group flex items-center gap-2.5">
-					<span class="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-accent-ink transition group-hover:rotate-6">
+				<RouterLink :to="{name: 'dashboard'}" class="group flex min-w-0 items-center gap-2.5">
+					<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-ink transition group-hover:rotate-6">
 						<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 							<rect x="3" y="4" width="18" height="16" rx="2.5" />
 							<path d="M3 9h18M3 15h18M8 4v16M16 4v16" />
 						</svg>
 					</span>
-					<span class="display text-xl font-semibold tracking-tight">{{ site.name }}</span>
+					<span class="display truncate text-xl font-semibold tracking-tight">{{ site.name }}</span>
 				</RouterLink>
 
-				<div class="flex items-center gap-3">
+				<div class="flex shrink-0 items-center gap-3">
 					<div v-if="auth.user" class="flex items-center gap-2.5">
-						<span class="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-raised text-sm font-bold uppercase text-accent">
+						<span :aria-label="`Signed in as ${auth.user.username}`"
+							  class="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-raised text-sm font-bold uppercase text-accent">
 							{{ auth.user.username.slice(0, 1) }}
 						</span>
 						<div class="hidden text-left text-sm leading-tight sm:block">
@@ -36,7 +37,7 @@ const logout = () => {
 							<p class="text-xs text-white/50">{{ auth.role?.name ?? 'No role' }}</p>
 						</div>
 					</div>
-					<button type="button" @click="logout" class="btn-ghost !px-4 !py-2">Logout</button>
+					<button type="button" @click="logout" class="btn-ghost whitespace-nowrap !px-4 !py-2">Logout</button>
 				</div>
 			</div>
 		</header>
@@ -45,9 +46,9 @@ const logout = () => {
 			<slot />
 		</main>
 
-		<footer class="mx-auto max-w-6xl px-4 pb-10 text-xs leading-relaxed text-white/40 sm:px-6">
+		<footer class="mx-auto max-w-6xl break-words px-4 pb-10 text-xs leading-relaxed text-white/40 sm:px-6">
 			<p>
-				Movie, series and K-drama data and posters from TMDB. Anime data from MyAnimeList through Jikan.
+				Movie, series and K-drama data and posters from TMDB. Anime data from AniList.
 				This product uses the TMDB API but is not endorsed or certified by TMDB.
 			</p>
 		</footer>

@@ -16,12 +16,17 @@ const emit = defineEmits<{
 }>()
 
 const status = ref<WatchStatus>(props.entry?.status ?? 'plan_to_watch')
-const rating = ref(props.entry?.rating != null ? String(props.entry.rating) : '')
-const season = ref(props.entry?.season != null ? String(props.entry.season) : '')
-const episode = ref(props.entry?.episode != null ? String(props.entry.episode) : '')
+// a number input gives back a number, or an empty string when it is blank
+const rating = ref<number | string>(props.entry?.rating ?? '')
+const season = ref<number | string>(props.entry?.season ?? '')
+const episode = ref<number | string>(props.entry?.episode ?? '')
 const dateStarted = ref(props.entry?.date_started ?? '')
 
-const toNumber = (value: string) => (value.trim() === '' ? null : Number(value))
+const toNumber = (value: number | string) => {
+	if (String(value).trim() === '') return null
+	const n = Number(value)
+	return Number.isNaN(n) ? null : n
+}
 
 const submit = () => {
 	emit('save', {
@@ -45,9 +50,9 @@ const label = 'field-label'
 		 @click.self="emit('close')">
 		<div class="modal-panel max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain panel !bg-panel p-5 shadow-2xl sm:p-7">
 			<div class="flex items-start justify-between gap-4">
-				<div>
+				<div class="min-w-0">
 					<p class="eyebrow">{{ entry ? 'Edit entry' : 'Add to my list' }}</p>
-					<h3 class="mt-1 display text-2xl font-semibold">{{ title }}</h3>
+					<h3 class="mt-1 display break-words text-2xl font-semibold">{{ title }}</h3>
 				</div>
 				<button type="button" @click="emit('close')" aria-label="Close"
 						class="-mr-2 -mt-2 flex h-10 w-10 shrink-0 items-center justify-center text-2xl leading-none text-white/60 transition hover:text-white">
@@ -66,15 +71,15 @@ const label = 'field-label'
 				<div class="grid grid-cols-3 gap-3">
 					<div>
 						<label :class="label" for="rating">Rating</label>
-						<input id="rating" v-model="rating" type="number" min="1" max="10" placeholder="1-10" :class="input" />
+						<input id="rating" v-model="rating" type="number" inputmode="numeric" min="1" max="10" placeholder="1-10" :class="input" />
 					</div>
 					<div>
 						<label :class="label" for="season">Season</label>
-						<input id="season" v-model="season" type="number" min="1" :class="input" />
+						<input id="season" v-model="season" type="number" inputmode="numeric" min="1" :class="input" />
 					</div>
 					<div>
 						<label :class="label" for="episode">Episode</label>
-						<input id="episode" v-model="episode" type="number" min="1" :class="input" />
+						<input id="episode" v-model="episode" type="number" inputmode="numeric" min="1" :class="input" />
 					</div>
 				</div>
 
@@ -85,13 +90,11 @@ const label = 'field-label'
 
 				<p v-if="error" class="alert-error">{{ error }}</p>
 
-				<div class="flex justify-end gap-3 pt-2">
-					<button type="button" @click="emit('close')"
-							class="btn-ghost">
+				<div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+					<button type="button" @click="emit('close')" class="btn-ghost w-full sm:w-auto">
 						Cancel
 					</button>
-					<button type="submit" :disabled="saving"
-							class="btn-primary">
+					<button type="submit" :disabled="saving" class="btn-primary w-full sm:w-auto">
 						{{ saving ? 'Saving...' : entry ? 'Save changes' : 'Add to list' }}
 					</button>
 				</div>

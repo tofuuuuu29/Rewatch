@@ -88,11 +88,14 @@ const countOf = (key: string) => {
 	return c ? media.items[c.key].length : null
 }
 
-const switchTab = (key: string) => {
+const switchTab = (key: string, e?: Event) => {
 	tab.value = key
 	search.value = ''
 	actionError.value = ''
 	notice.value = ''
+
+	// on a phone the tab strip scrolls sideways: bring the tapped tab into view
+	;(e?.currentTarget as HTMLElement | null)?.scrollIntoView?.({inline: 'center', block: 'nearest', behavior: 'smooth'})
 }
 
 onMounted(() => {
@@ -272,9 +275,9 @@ const changeStatus = async (entry: WatchEntry, status: WatchEntry['status']) => 
 		</div>
 
 		<!-- tabs: scroll sideways on small screens -->
-		<div class="-mx-4 mt-9 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+		<div class="-mx-4 mt-9 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
 			<div class="inline-flex gap-1 rounded-full border border-white/10 bg-panel/80 p-1.5">
-				<button v-for="t in tabs" :key="t.key" type="button" @click="switchTab(t.key)"
+				<button v-for="t in tabs" :key="t.key" type="button" @click="switchTab(t.key, $event)"
 						class="flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium transition"
 						:class="tab === t.key ? 'bg-accent text-accent-ink shadow' : 'text-white/70 hover:text-white'">
 					<MediaIcon v-if="t.key !== 'users'" :kind="t.key"
@@ -287,13 +290,13 @@ const changeStatus = async (entry: WatchEntry, status: WatchEntry['status']) => 
 			</div>
 		</div>
 
-		<!-- numbers (My List only) -->
-		<div v-if="tab === 'mylist'" class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+		<!-- numbers (My List only): 2 across on phones, 4 across from tablet width -->
+		<div v-if="tab === 'mylist'" class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
 			<div v-for="card in statCards" :key="card.label"
-				 class="relative overflow-hidden rounded-2xl border bg-gradient-to-l to-transparent p-5" :class="card.box">
-				<MediaIcon :kind="card.kind" class="pointer-events-none absolute -bottom-3 -right-3 h-28 w-28" :class="card.ghost" />
+				 class="relative overflow-hidden rounded-2xl border bg-gradient-to-l to-transparent p-4 sm:p-5" :class="card.box">
+				<MediaIcon :kind="card.kind" class="pointer-events-none absolute -bottom-3 -right-3 h-24 w-24 sm:h-28 sm:w-28" :class="card.ghost" />
 				<MediaIcon :kind="card.kind" class="relative h-6 w-6" :class="card.icon" />
-				<p class="display relative mt-3 text-4xl font-semibold leading-none">{{ card.value }}</p>
+				<p class="display relative mt-3 text-3xl font-semibold leading-none sm:text-4xl">{{ card.value }}</p>
 				<p class="relative mt-2 text-[11px] font-medium uppercase tracking-widest text-white/50">{{ card.label }}</p>
 			</div>
 		</div>
@@ -304,7 +307,7 @@ const changeStatus = async (entry: WatchEntry, status: WatchEntry['status']) => 
 					   :options="suggestions" :create-label="cfg.singular" :remote="searchOnline"
 					   @create="openAddTitleNamed" @pick-remote="addFromWeb" />
 
-			<button type="button" @click="openAddTitle" class="btn-primary">+ Add {{ cfg.singular }}</button>
+			<button type="button" @click="openAddTitle" class="btn-primary w-full sm:w-auto">+ Add {{ cfg.singular }}</button>
 		</div>
 
 		<p v-if="media.error || watched.error" class="alert-error mt-4">{{ media.error || watched.error }}</p>

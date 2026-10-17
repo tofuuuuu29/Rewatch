@@ -35,6 +35,10 @@ const fit = ref<Record<string, 'wide' | 'tall'>>({}) // measured when each image
 const index = ref(0)
 let timer: number | undefined
 
+// the poster panel only exists from 1024px up
+const desktop = window.matchMedia('(min-width: 1024px)')
+let loaded = false
+
 // people who asked their system for less motion keep the fade but not the zoom
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -72,7 +76,7 @@ const stop = () => {
 
 const start = () => {
 	stop()
-	if (shown.value.length < 2 || document.hidden) return
+	if (!desktop.matches || shown.value.length < 2 || document.hidden) return
 	timer = window.setInterval(() => {
 		index.value = (index.value + 1) % shown.value.length
 	}, SLIDE_MS)
@@ -98,30 +102,45 @@ const onImageLoad = (url: string, e: Event) => {
 // pause while the tab is hidden
 const onVisibility = () => (document.hidden ? stop() : start())
 
-onMounted(async () => {
-	// the panel is hidden on small screens, so don't download anything there
-	if (!window.matchMedia('(min-width: 1024px)').matches) return
-
-	document.addEventListener('visibilitychange', onVisibility)
-
+// download the slides only once the panel is actually visible
+const loadSlides = async () => {
+	if (loaded || !desktop.matches) return
+	loaded = true
 	try {
 		const {data} = await api.get<Slide[]>('/discover/trending/')
 		slides.value = Array.isArray(data) ? data.filter((s) => s.title && s.image_url) : []
 		start()
 	} catch {
-		// keep the decorative posters
+		loaded = false // keep the decorative posters, and try again if the screen changes
 	}
+}
+
+// a tablet turned sideways, or a window made wider or narrower
+const onScreenChange = () => {
+	if (desktop.matches) {
+		if (loaded) start()
+		else loadSlides()
+	} else {
+		stop()
+	}
+}
+
+onMounted(() => {
+	document.addEventListener('visibilitychange', onVisibility)
+	desktop.addEventListener('change', onScreenChange)
+	loadSlides()
 })
 
 onBeforeUnmount(() => {
 	stop()
 	document.removeEventListener('visibilitychange', onVisibility)
+	desktop.removeEventListener('change', onScreenChange)
 })
 </script>
 
 <template>
 	<div class="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-		<!-- left: brand + trending slideshow (desktop only) -->
+		<!-- left: brand + trending slideshow (from 1024px up) -->
 		<aside class="relative hidden overflow-hidden border-r border-white/10 lg:block">
 			<!-- fallback: tilted poster wall -->
 			<div v-if="!shown.length" class="absolute inset-0 grid -rotate-6 scale-125 grid-cols-3 gap-4 p-10 opacity-60" aria-hidden="true">
@@ -141,7 +160,7 @@ onBeforeUnmount(() => {
 							 class="absolute inset-0 h-full w-full scale-125 object-cover opacity-50 blur-xl" />
 						<img :src="slide.image_url" alt="" referrerpolicy="no-referrer" decoding="async"
 							 :class="fit[slide.image_url] === 'tall'
-								? 'absolute inset-0 h-full w-full object-contain px-10 pb-72 pt-28'
+								? 'absolute inset-0 h-full w-full object-contain px-10 pb-60 pt-28 xl:pb-72'
 								: 'absolute inset-0 h-full w-full object-cover'"
 							 @load="onImageLoad(slide.image_url, $event)"
 							 @error="onImageError(slide.image_url)" />
@@ -152,15 +171,15 @@ onBeforeUnmount(() => {
 			<div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/25"></div>
 
 			<!-- what is on screen + dots -->
-			<div v-if="shown.length && current" class="absolute inset-x-12 top-10 z-20 flex items-start justify-between gap-6">
-				<div>
+			<div v-if="shown.length && current" class="absolute inset-x-8 top-10 z-20 flex items-start justify-between gap-6 xl:inset-x-12">
+				<div class="min-w-0">
 					<p class="eyebrow">Trending now</p>
-					<p class="mt-1 text-sm text-white/80">
+					<p class="mt-1 truncate text-sm text-white/80">
 						{{ current.title }}<span v-if="current.year" class="text-white/50"> · {{ current.year }}</span>
 					</p>
 					<p class="text-xs text-white/50">{{ current.category }}</p>
 				</div>
-				<div v-if="shown.length > 1" class="flex items-center gap-2 pt-1">
+				<div v-if="shown.length > 1" class="flex shrink-0 items-center gap-2 pt-1">
 					<button v-for="(slide, i) in shown" :key="slide.image_url" type="button"
 							class="h-1.5 rounded-full transition-all"
 							:class="isOn(i) ? 'w-6 bg-accent' : 'w-1.5 bg-white/30 hover:bg-white/60'"
@@ -168,9 +187,9 @@ onBeforeUnmount(() => {
 				</div>
 			</div>
 
-			<div class="relative z-20 flex h-full flex-col justify-end p-12">
+			<div class="relative z-20 flex h-full flex-col justify-end p-8 xl:p-12">
 				<p class="eyebrow">{{ site.name }}</p>
-				<h2 class="display mt-3 max-w-md text-5xl font-semibold leading-[1.05]">
+				<h2 class="display mt-3 max-w-md text-4xl font-semibold leading-[1.05] xl:text-5xl">
 					Every story you've <em class="text-accent">finished</em>, in one place.
 				</h2>
 				<p class="mt-4 max-w-sm text-white/60">Movies, anime, K-dramas and series. Rate them, track your episodes, never lose your place.</p>
