@@ -1,0 +1,68 @@
+[
+  {
+    "v": 1,
+    "name": "Watched Tracker (local)",
+    "variables": [
+      {
+        "key": "baseUrl",
+        "value": "http://127.0.0.1:8000/api"
+      },
+      {
+        "key": "adminUsername",
+        "value": "admin"
+      },
+      {
+        "key": "adminPassword",
+        "value": "admin12345"
+      },
+      {
+        "key": "userUsername",
+        "value": "viewer"
+      },
+      {
+        "key": "userPassword",
+        "value": "viewer12345"
+      },
+      {
+        "key": "accessToken",
+        "value": ""
+      },
+      {
+        "key": "refreshToken",
+        "value": ""
+      },
+      {
+        "key": "userAccessToken",
+        "value": ""
+      },
+      {
+        "key": "userId",
+        "value": ""
+      },
+      {
+        "key": "roleId",
+        "value": ""
+      },
+      {
+        "key": "movieId",
+        "value": ""
+      },
+      {
+        "key": "animeId",
+        "value": ""
+      },
+      {
+        "key": "kdramaId",
+        "value": ""
+      },
+      {
+        "key": "tvId",
+        "value": ""
+      },
+      {
+        "key": "typeId",
+        "value": ""
+      }
+    ]
+  }
+]

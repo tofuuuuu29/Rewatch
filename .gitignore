@@ -1,0 +1,21 @@
+﻿# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+staticfiles/
+
+# Node
+node_modules/
+dist/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
