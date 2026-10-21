@@ -48,8 +48,7 @@ const logout = () => {
 
 		<footer class="mx-auto max-w-6xl break-words px-4 pb-10 text-xs leading-relaxed text-white/40 sm:px-6">
 			<p>
-				Movie, series and K-drama data and posters from TMDB. Anime data from AniList.
-				This product uses the TMDB API but is not endorsed or certified by TMDB.
+				<p>© 2026 Christian Gil M. German. All rights reserved.</p>
 			</p>
 		</footer>
 	</div>
